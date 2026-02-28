@@ -31,14 +31,21 @@ namespace IPC2_PROYECTO1_202401753.Logica
 
             string patronActual = paciente.Rejilla.ObtenerPatron();
 
+            // Si no hay células contagiadas, es leve
+            if (paciente.Rejilla.ContarContagiadas() == 0)
+            {
+                paciente.Resultado = "leve";
+                paciente.N = periodoActual;
+                paciente.N1 = 0;
+                return true;
+            }
+
             // Buscar si el patrón actual ya existió antes
             int indicePeriodo = BuscarPatron(patronActual);
 
             if (indicePeriodo != -1)
             {
-                // Encontramos un ciclo
-                int N = indicePeriodo;         // período donde apareció el patrón antes
-                int N1 = periodoActual - N;    // cuántos períodos tardó en repetirse
+                int N1 = periodoActual - indicePeriodo;
 
                 paciente.N = periodoActual;
                 paciente.N1 = N1;
@@ -48,20 +55,18 @@ namespace IPC2_PROYECTO1_202401753.Logica
                 else
                     paciente.Resultado = "grave";
 
-                return true; // ciclo encontrado
+                return true;
             }
 
-            // Si no encontramos ciclo, guardamos el patrón actual
             historialPatrones.Agregar(patronActual);
 
-            // Si llegamos al límite de períodos sin encontrar ciclo
             if (periodoActual >= paciente.Periodos)
             {
                 paciente.Resultado = "leve";
                 return true;
             }
 
-            return false; // seguir simulando
+            return false;
         }
 
         // Ejecutar todos los períodos automáticamente

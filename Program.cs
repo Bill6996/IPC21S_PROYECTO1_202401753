@@ -2,10 +2,13 @@
 using IPC2_PROYECTO1_202401753.Estructuras;
 using IPC2_PROYECTO1_202401753.Logica;
 using IPC2_PROYECTO1_202401753.Modelos;
+using System.Diagnostics;
+
 
 ListaEnlazada<Paciente> pacientes = new ListaEnlazada<Paciente>();
 LectorXML lector = new LectorXML();
 EscritorXML escritor = new EscritorXML();
+GeneradorGraphviz graphviz = new GeneradorGraphviz();
 Simulador simuladorActivo = null;
 Paciente pacienteActivo = null;
 
@@ -22,10 +25,9 @@ while (!salir)
     Console.WriteLine("║  3. Ejecutar un período                  ║");
     Console.WriteLine("║  4. Ejecutar todos los períodos          ║");
     Console.WriteLine("║  5. Generar archivo XML de salida        ║");
-    Console.WriteLine("║  6. Limpiar pacientes                    ║");
-    Console.WriteLine("║  7. Salir                                ║");
-    Console.WriteLine("╚══════════════════════════════════════════╝");
-
+    Console.WriteLine("║  6. Generar imagen Graphviz              ║"); 
+    Console.WriteLine("║  7. Limpiar pacientes                    ║");
+    Console.WriteLine("║  8. Salir                                ║");
     if (pacienteActivo != null)
         Console.WriteLine($"\n👤 Paciente activo: {pacienteActivo.Nombre}");
 
@@ -98,6 +100,23 @@ while (!salir)
             bool terminado = simuladorActivo.EjecutarUnPeriodo();
             simuladorActivo.MostrarEstado();
 
+            // Generar imagen automáticamente
+            string carpetaPeriodo = Path.Combine(
+                AppDomain.CurrentDomain.BaseDirectory, "imagenes"
+            );
+            graphviz.GenerarImagen(
+                pacienteActivo.Rejilla,
+                simuladorActivo.PeriodoActual,
+                carpetaPeriodo
+            );
+
+            // Abrir la imagen automáticamente
+            Process.Start(new ProcessStartInfo()
+            {
+                FileName = Path.Combine(carpetaPeriodo, $"periodo_{simuladorActivo.PeriodoActual}.png"),
+                UseShellExecute = true
+            });
+
             if (terminado)
                 Console.WriteLine("✅ Simulación completada.");
 
@@ -145,6 +164,26 @@ while (!salir)
 
         case "6":
             Console.Clear();
+            if (simuladorActivo == null)
+            {
+                Console.WriteLine("❌ Selecciona un paciente primero.");
+                Console.ReadKey();
+                break;
+            }
+            string carpeta = Path.Combine(
+                AppDomain.CurrentDomain.BaseDirectory, "imagenes"
+            );
+            graphviz.GenerarImagen(
+                pacienteActivo.Rejilla,
+                simuladorActivo.PeriodoActual,
+                carpeta
+            );
+            Console.WriteLine($"📁 Imágenes guardadas en: {carpeta}");
+            Console.ReadKey();
+            break;
+
+        case "7":
+            Console.Clear();
             pacientes.Limpiar();
             simuladorActivo = null;
             pacienteActivo = null;
@@ -152,13 +191,10 @@ while (!salir)
             Console.ReadKey();
             break;
 
-        case "7":
-            salir = true;
-            break;
 
-        default:
-            Console.WriteLine("❌ Opción inválida.");
-            Console.ReadKey();
+
+        case "8":
+            salir = true;
             break;
     }
 }

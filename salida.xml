@@ -1,0 +1,24 @@
+<pacientes>
+  <paciente>
+    <datospersonales>
+      <nombre>Juan Pérez</nombre>
+      <edad>30</edad>
+    </datospersonales>
+    <periodos>100</periodos>
+    <m>10</m>
+    <resultado>mortal</resultado>
+    <n>1</n>
+    <n1>1</n1>
+  </paciente>
+  <paciente>
+    <datospersonales>
+      <nombre>María López</nombre>
+      <edad>25</edad>
+    </datospersonales>
+    <periodos>100</periodos>
+    <m>10</m>
+    <resultado>grave</resultado>
+    <n>2</n>
+    <n1>2</n1>
+  </paciente>
+</pacientes>
